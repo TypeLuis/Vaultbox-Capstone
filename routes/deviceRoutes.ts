@@ -95,8 +95,8 @@ deviceRouter
             }
 
             if (userId) {
-                if (!isValidId(String(userId))) return next(msgError(400, "Invalid deviceId"));
-                filter.deviceId = String(userId)
+                if (!isValidId(String(userId))) return next(msgError(400, "Invalid userId"));
+                filter.userId = String(userId)
             }
 
             // regex to find query in title, $options: "i" to make case insensitive
