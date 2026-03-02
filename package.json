@@ -9,7 +9,8 @@
     "initialize": "npx tsc --init",
     "seed": "npx tsx ./utilities/seed.ts",
     "env": "node -e \"require('fs').copyFileSync('.env.example', '.env')\"",
-    "install:minio": "npx tsx ./scripts/install-minio.ts"
+    "install:minio": "npx tsx ./scripts/install-minio.ts",
+    "start:minio": "npx tsx ./scripts/start-minio.ts"
   },
   "keywords": [],
   "author": "",
