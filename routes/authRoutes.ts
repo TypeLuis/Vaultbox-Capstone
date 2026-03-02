@@ -2,8 +2,8 @@ import express, { type RequestHandler } from "express";
 import User from '../models/userSchema.js'
 import { JWT_SECRET } from "../utilities/config.js";
 import bcrypt from "bcryptjs";
-import jwt  from "jsonwebtoken";
-import {check, validationResult } from 'express-validator'
+import jwt from "jsonwebtoken";
+import { check, validationResult } from 'express-validator'
 import { auth } from "../middleware/auth.js";
 
 const router = express.Router()
@@ -23,22 +23,22 @@ router
         ],
         (async (req, res, next) => {
             const errors = validationResult(req)
-            if(!errors.isEmpty()) return res.status(400).json({errors : errors.array()});
+            if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-            const {email, password} = req.body
+            const { email, password } = req.body
 
             try {
                 // find user by email
-                let user = await User.findOne({email})
+                let user = await User.findOne({ email })
 
                 // If no user, res with error
-                if(!user) return res.status(400).json({errors : [{msg : "Invalid Credentials"}]});
+                if (!user) return res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
 
                 // compare password with DB password
                 const isMatch = await bcrypt.compare(password, user.password)
 
                 // if no match, return error
-                if(!isMatch) return res.status(400).json({errors : [{msg: "Invalid Credentials"}]});
+                if (!isMatch) return res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
 
                 // create payload for jwt
                 const payload = {
@@ -51,23 +51,23 @@ router
                 jwt.sign(
                     payload,
                     JWT_SECRET,
-                    {expiresIn: "3h"},
+                    { expiresIn: "3h" },
                     (err, token) => {
-                        if(err) throw err
+                        if (err) throw err
 
-                        res.json({token})
+                        res.json({ token })
                     }
                 )
-            } catch (error:any) {
+            } catch (error: any) {
                 console.error(error.message)
-                res.status(500).json({errors : error.message})
+                res.status(500).json({ errors: error.message })
             }
 
         }) as RequestHandler
     )
 
 
-    .get(auth, (async(req,res) => {
+    .get(auth, (async (req, res) => {
         if (!req.user?.id) {
             return res.status(401).json({ errors: [{ msg: "Not authorized" }] });
         }

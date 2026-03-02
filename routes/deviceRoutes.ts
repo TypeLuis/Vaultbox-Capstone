@@ -7,7 +7,7 @@ import { isValidId, toNumber } from "../utilities/functions.js";
 import si from "systeminformation";
 
 
-type Drives =  {
+type Drives = {
     fs: string,
     type: string,
     size: number,
@@ -27,10 +27,10 @@ deviceRouter
     .post(
         requireBody(["userId", "q"]),
         (async (req, res, next) => {
-            const {userId, q} = req.body
+            const { userId, q } = req.body
             try {
                 if (!isValidId(String(userId))) return next(msgError(400, "Invalid userId"));
-                const getDriveInfo = (drives:Drives[]) => {
+                const getDriveInfo = (drives: Drives[]) => {
                     return drives.map((drive) => ({
                         fs: drive.fs,
                         type: drive.type,
@@ -44,7 +44,7 @@ deviceRouter
                 }
                 let deviceData;
                 const useSystemInfo = q.toLowerCase() === "yes";
-    
+
                 if (useSystemInfo) {
                     const [osInfo, fsSize] = await Promise.all([
                         si.osInfo(),
@@ -67,7 +67,7 @@ deviceRouter
                     if (!name) return next(msgError(400, "name is required when not using system info"));
                     if (!drives || !Array.isArray(drives) || drives.length === 0)
                         return next(msgError(400, "drives array is required when not using system info"));
-    
+
                     deviceData = { userId, name, drives, status: "online" };
                 }
 

@@ -27,15 +27,6 @@ const deviceSchema = new mongoose.Schema({
         type: [driveSchema],
         default: [],
     },
-    // storageTotalGB: {
-    //     type: Number,
-    //     required: true,
-    // },
-    // storageUsedGB: {
-    //     type: Number,
-    //     required: true,
-    //     default: 0,
-    // },
     status: {
         type: String,
         enum: ["online", "offline"],
