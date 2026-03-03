@@ -11,6 +11,12 @@
 
 # Test route is merely there for testing and referencing.
 
+-  minio setup
+- multier upload in config
+- device schema haveing an array of drive schemas
+- file routes explaination
+- install & start minio script
+
 
 <!-- Install MinIO (Linux / WSL / Ubuntu / Debian)
 

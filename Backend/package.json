@@ -11,7 +11,7 @@
     "env": "node -e \"require('fs').copyFileSync('.env.example', '.env')\"",
     "install:minio": "npx tsx ./scripts/install-minio.ts",
     "start:minio": "npx tsx ./scripts/start-minio.ts",
-    "initialize:minio" : "npx tsx ./scripts/install-minio.ts && npx tsx ./scripts/start-minio.ts"
+    "setup" : "npm run env && npm run install:minio"
   },
   "keywords": [],
   "author": "",

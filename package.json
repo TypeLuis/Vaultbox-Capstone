@@ -1,0 +1,31 @@
+{
+  "name": "capstone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "Backend",
+    "Frontend"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "initialize": "npm run setup --workspace=Backend",
+    "dev": "concurrently -k -n MINIO,BACKEND,FRONTEND -c blue,green,magenta \"npm run start:minio --workspace=Backend\" \"npm run dev --workspace=Backend\" \"npm run dev --workspace=Frontend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TypeLuis/Vaultbox-Capstone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/TypeLuis/Vaultbox-Capstone/issues"
+  },
+  "homepage": "https://github.com/TypeLuis/Vaultbox-Capstone#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
