@@ -1,20 +1,30 @@
 import { useDevices } from '../hooks/Usedevices';
 import VaultBoxIcon from './VaultboxIcon';
 import '../styles/NavDashboard.scss'
+import type { Page } from '../pages/Dashboard';
 
 type NavDashboardProps = {
-
+  setActivePage: React.Dispatch<React.SetStateAction<Page>>
+  activePage: Page
 }
 
-const NavDashboard = ({ }: NavDashboardProps) => {
-    const { devices } = useDevices();
+const NAV_ITEMS: { id: Page; label: string; icon: string }[] = [
+  { id: "devices", label: "Devices", icon: "⬡" },
+  { id: "files", label: "Files", icon: "⊟" },
+  { id: "apps", label: "Apps", icon: "⊞" },
+  { id: "settings", label: "Settings", icon: "⚙" },
+];
 
-    // Stats
-    const totalStorageGB = devices.reduce((sum, d) => sum + (d.storageTotalGB ?? 0), 0).toFixed(1);
-    const usedStorageGB = devices.reduce((sum, d) => sum + (d.storageUsedGB ?? 0), 0).toFixed(1);
-    return (
-        <>
-        
+
+const NavDashboard = ({ activePage, setActivePage }: NavDashboardProps) => {
+  const { devices } = useDevices();
+
+  // Stats
+  const totalStorageGB = devices.reduce((sum, d) => sum + (d.storageTotalGB ?? 0), 0).toFixed(1);
+  const usedStorageGB = devices.reduce((sum, d) => sum + (d.storageUsedGB ?? 0), 0).toFixed(1);
+  return (
+    <>
+
       <aside className="dashboard__sidebar">
         <div className="dashboard__brand">
           <VaultBoxIcon />
@@ -26,23 +36,21 @@ const NavDashboard = ({ }: NavDashboardProps) => {
           </div>
         </div>
 
+
+
         <nav className="dashboard__nav">
-          <a className="dashboard__nav-item active" href="#">
-            <span className="dashboard__nav-icon">⬡</span>
-            Devices
-          </a>
-          <a className="dashboard__nav-item" href="#">
-            <span className="dashboard__nav-icon">⊞</span>
-            Apps
-          </a>
-          <a className="dashboard__nav-item" href="#">
-            <span className="dashboard__nav-icon">⬛</span>
-            Files
-          </a>
-          <a className="dashboard__nav-item" href="#">
-            <span className="dashboard__nav-icon">⚙</span>
-            Settings
-          </a>
+          {NAV_ITEMS.map((item) => (
+            <>
+              <button
+                key={item.id}
+                className={`dashboard__nav-item ${activePage === item.id ? "active" : ""}`}
+                onClick={() => setActivePage(item.id)}
+              >
+                <span>{item.icon}</span>
+                {item.label}
+              </button>
+            </>
+          ))}
         </nav>
 
         {/* Sidebar storage summary */}
@@ -61,8 +69,8 @@ const NavDashboard = ({ }: NavDashboardProps) => {
           </div>
         </div>
       </aside>
-        </>
-    );
+    </>
+  );
 };
 
 export default NavDashboard;
