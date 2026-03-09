@@ -1,4 +1,4 @@
-import { execSync, spawnSync } from "child_process";
+import { execSync, spawnSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import si from "systeminformation";
@@ -20,12 +20,12 @@ fs.readFileSync(envPath, "utf-8")
         if (!trimmed || trimmed.startsWith("#")) return;
         const eqIndex = trimmed.indexOf("=");
         if (eqIndex === -1) return;
-        const key   = trimmed.slice(0, eqIndex).trim();
+        const key = trimmed.slice(0, eqIndex).trim();
         const value = trimmed.slice(eqIndex + 1).trim();
         if (key) env[key] = value;
     });
 
-const port      = env.MONGODB_PORT || "27017";
+const port = env.MONGODB_PORT || "27017";
 const directory = env.DIRECTORY;
 
 function pathExists(p: string): boolean {
@@ -36,7 +36,7 @@ function pathExists(p: string): boolean {
 
 function findMongodWindows(): string | null {
     const userProfile = process.env.USERPROFILE || "";
-    const candidates  = [
+    const candidates = [
         path.join(userProfile, "mongodb", "bin", "mongod.exe"),
         "C:\\Program Files\\MongoDB\\Server\\7.0\\bin\\mongod.exe",
         "C:\\Program Files\\MongoDB\\Server\\6.0\\bin\\mongod.exe",
@@ -53,7 +53,7 @@ function findMongodWindows(): string | null {
         ).trim();
         const first = result.split("\n")[0]?.trim();
         if (first && fs.existsSync(first)) return first;
-    } catch {}
+    } catch { }
 
     return null;
 }
@@ -62,7 +62,7 @@ function findMongodUnix(): string | null {
     try {
         const result = execSync("which mongod", { encoding: "utf-8" }).trim();
         if (result && fs.existsSync(result)) return result;
-    } catch {}
+    } catch { }
 
     const candidates = [
         "/usr/bin/mongod",
@@ -82,19 +82,19 @@ function findMongodUnix(): string | null {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-    const osInfo    = await si.osInfo();
-    const platform  = osInfo.platform.toLowerCase();
+    const osInfo = await si.osInfo();
+    const platform = osInfo.platform.toLowerCase();
     const isWindows = platform === "win32" || platform === "windows";
 
-    const pathExist      = pathExists("/mnt/data");
+    const pathExist = pathExists("/mnt/data");
     const directoryExist = directory && pathExists(directory);
 
     console.log(`\n🚀 Starting MongoDB on ${osInfo.distro || osInfo.platform}...`);
 
     // On Linux/Mac, prefer the managed service if it's available
     if (!isWindows) {
-        const isMac   = platform === "darwin";
-        const svcCmd  = isMac
+        const isMac = platform === "darwin";
+        const svcCmd = isMac
             ? "brew services start mongodb/brew/mongodb-community"
             : "systemctl start mongod";
         const checkCmd = isMac
@@ -132,10 +132,10 @@ async function main() {
     //   DIRECTORY env var → /mnt/data → cwd
     let dataDir: string;
 
-    if (directoryExist)     dataDir = path.join(directory, "mongodb-data");
-    else if (isWindows)     dataDir = "C:\\mongodb\\data";
-    else if (pathExist)     dataDir = path.join("/mnt/data", "mongodb-data");
-    else                    dataDir = path.join(process.cwd(), "mongodb-data");
+    if (directoryExist) dataDir = path.join(directory, "mongodb-data");
+    else if (isWindows) dataDir = "C:\\data\\db";
+    else if (pathExist) dataDir = path.join("/mnt/data", "mongodb-data");
+    else dataDir = path.join(process.cwd(), "mongodb-data");
 
     if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir, { recursive: true });
@@ -162,11 +162,17 @@ async function main() {
 
     const args = [
         "--dbpath", dataDir,
-        "--port",   port,
+        "--port", port,
         "--bind_ip", "0.0.0.0",     // all interfaces — accessible on local network
     ];
 
-    spawnSync(mongodPath, args, { stdio: "inherit" });
+    // spawnSync(mongodPath, args, { stdio: "inherit" });
+    const child = spawn(mongodPath, args, { stdio: "inherit" });
+
+    child.on("error", (err) => {
+        console.error(`\n❌ Failed to start mongod: ${err.message}`);
+        process.exit(1);
+    });
 }
 
 main().catch((e) => {

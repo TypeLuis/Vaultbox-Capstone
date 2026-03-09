@@ -16,9 +16,29 @@ import { ensureBucket } from "./config/minioClient.js";
 
 // Setup
 const app = express()
-connectDB()
 const routesReport = rowdy.begin(app)
-await ensureBucket(); // make sure minio is running
+
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForMinio(attempts = 20, delay = 1500) {
+    let lastError: unknown;
+
+    for (let i = 1; i <= attempts; i++) {
+        try {
+            await ensureBucket();
+            console.log(`✅ MinIO ready (attempt ${i})`);
+            return;
+        } catch (error) {
+            lastError = error;
+            console.log(`⏳ Waiting for MinIO... (${i}/${attempts})`);
+            await sleep(delay);
+        }
+    }
+
+    throw lastError;
+}
 
 
 // Middleware
@@ -43,8 +63,22 @@ app.use('/api/file', fileRouter)
 app.use(notFound)
 app.use(globalerror)
 
-// Listener
-app.listen(PORT, "0.0.0.0", ()=> {
-    console.log(`server is running on PORT: ${PORT}`)
-    routesReport.print()
-})
+
+async function startServer() {
+    try {
+        await connectDB();
+        console.log("✅ MongoDB connected");
+
+        await waitForMinio();
+
+        app.listen(PORT, "0.0.0.0", () => {
+            console.log(`server is running on PORT: ${PORT}`);
+            routesReport.print();
+        });
+    } catch (error) {
+        console.error("❌ Failed to start server:", error);
+        process.exit(1);
+    }
+}
+
+startServer();
