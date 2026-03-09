@@ -28,7 +28,7 @@ const Main_Carousel = () => {
     }
 
     const removeInterval = (): void => {
-        const interval_id = window.setInterval(function () {}, Number.MAX_SAFE_INTEGER)
+        const interval_id = window.setInterval(function () { }, Number.MAX_SAFE_INTEGER)
         for (let i = 1; i < interval_id; i++) {
             window.clearInterval(i)
         }
@@ -121,7 +121,6 @@ const Main_Carousel = () => {
 
         checkBoundary()
     }
-
     useEffect(() => {
         const containerStyle = containerRef.current?.style
         const containerClass = containerRef.current?.classList
@@ -135,31 +134,39 @@ const Main_Carousel = () => {
             containerStyle.transition = 'left 1s'
         }
 
-        let myInterval = setInterval(carouselSlide, 8000)
+        let myInterval = window.setInterval(carouselSlide, 8000)
+
+        const removeInterval = (): void => {
+            clearInterval(myInterval)
+        }
 
         const buttonSlider = (): void => {
             const sliderButtons = document.getElementsByClassName(classes.slider_button)
             const sliderSpread = Array.from(sliderButtons) as HTMLElement[]
 
             sliderSpread.forEach((button, i) => {
-                button.addEventListener('click', () => {
-                    addTransition()
+                button.addEventListener(
+                    'click',
+                    () => {
+                        addTransition()
 
-                    const position = -window.innerWidth * i
-                    const index = i
+                        const position = -window.innerWidth * i
+                        const index = i
 
-                    containerClass.remove(classes.img1)
-                    containerClass.remove(classes.img2)
-                    removeInterval()
+                        containerClass.remove(classes.img1)
+                        containerClass.remove(classes.img2)
+                        removeInterval()
 
-                    setTimeout(() => {
-                        if (index === 0) containerClass.add(classes.img1)
-                        if (index === 1) containerClass.add(classes.img2)
-                        myInterval = setInterval(carouselSlide, 8000)
-                    }, 1000)
+                        setTimeout(() => {
+                            if (index === 0) containerClass.add(classes.img1)
+                            if (index === 1) containerClass.add(classes.img2)
+                            myInterval = window.setInterval(carouselSlide, 8000)
+                        }, 1000)
 
-                    containerStyle.left = `${position}px`
-                }, { capture: true })
+                        containerStyle.left = `${position}px`
+                    },
+                    { capture: true }
+                )
             })
         }
 
@@ -172,7 +179,7 @@ const Main_Carousel = () => {
             setTimeout(() => {
                 containerClass.add(classes.img1)
                 containerStyle.left = '0'
-                myInterval = setInterval(carouselSlide, 8000)
+                myInterval = window.setInterval(carouselSlide, 8000)
             }, 1000)
         }
 
