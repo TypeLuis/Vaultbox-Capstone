@@ -9,7 +9,6 @@ import DeployedPage from './pages/DeployedPage';
 import SetupPage from './pages/SetupPage';
 
 function App() {
-  // const selfHosted = import.meta.env.VITE_SELF_HOSTED === "";
   const selfHosted = import.meta.env.VITE_SELF_HOSTED === "true";
   return (
     <>
