@@ -40,7 +40,7 @@ const osLabels: Record<OS, { label: string; icon: string; shell: string }> = {
 }
 
 const SetupPage: React.FC = () => {
-    const [activeOS, setActiveOS] = useState<OS>('mac')
+    const [activeOS, setActiveOS] = useState<OS>('windows')
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
 
     const handleCopy = (text: string, index: number) => {
